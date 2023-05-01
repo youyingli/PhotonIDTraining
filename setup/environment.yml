@@ -1,0 +1,11 @@
+name: photon_id_xgboost
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - uproot
+  - pandas
+  - matplotlib
+  - xgboost
+  - optuna
