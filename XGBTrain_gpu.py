@@ -13,11 +13,9 @@ isEB = False
 var = [
     "f_rho"                         ,
     "f_SCRawE"                      ,
-    "f_ESE"                         ,
     "f_SCEta"                       ,
     "f_etaWidth"                    ,
     "f_phiWidth"                    ,
-    "f_esEffSigmaRR"                ,
     "f_sieie"                       ,
     "f_sieip"                       ,
     "f_s4"                          ,
@@ -26,9 +24,15 @@ var = [
 
 ]
 
-with uproot.open('photon.root') as f:
+if not isEB:
+    var.insert(2, "f_ESE")
+    var.insert(6, "f_esEffSigmaRR")
+
+with uproot.open('/wk_cms3/youying/public/photon.root') as f:
     tree = f['photoID'].arrays(library='pd')
 
+outdir = 'example'
+result_tag = 'EB' if isEB else 'EE'
 
 signal     = tree.loc[ (tree['f_isPrompt'] == True)  & (tree['f_isEB'] == isEB) & (tree['f_pt'] > 18.) ]
 background = tree.loc[ (tree['f_isPrompt'] == False) & (tree['f_isEB'] == isEB) & (tree['f_pt'] > 18.) ]
@@ -68,14 +72,11 @@ y_train = np.concatenate((y_sig_train, y_bkg_train), axis=0)
 y_test  = np.concatenate((y_sig_test,  y_bkg_test), axis=0)
 
 
-
-
 #------------------------------------------------------------
 # XGBoost training engine
 #------------------------------------------------------------
 
 def objective(trial):
-
 
     # XGBoost sklearn configuration
     XGBEngine = xgboost.XGBClassifier(
@@ -126,7 +127,7 @@ print( study.best_trial.params )
 from optuna.visualization import plot_optimization_history, plot_param_importances
 
 fig = plot_optimization_history(study)
-fig.write_image(file='optimization_history.png', format='png')
+fig.write_image(file=f'{outdir}/optimization_history_{result_tag}.png', format='png')
 
 fig = plot_param_importances(study)
-fig.write_image(file='param_importances.png', format='png')
+fig.write_image(file=f'{outdir}/param_importances_{result_tag}.png', format='png')

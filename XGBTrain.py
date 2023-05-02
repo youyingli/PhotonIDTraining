@@ -26,12 +26,11 @@ if not isEB:
     var.insert(2, "f_ESE")
     var.insert(6, "f_esEffSigmaRR")
 
-with uproot.open('photon.root') as f:
+with uproot.open('/wk_cms3/youying/public/photon.root') as f:
     tree = f['photoID'].arrays(library='pd')
 
-outdir = ''
+outdir = 'example'
 result_tag = 'EB' if isEB else 'EE'
-
 
 signal     = tree.loc[ (tree['f_isPrompt'] == True)  & (tree['f_isEB'] == isEB) & (tree['f_pt'] > 18.) ]
 background = tree.loc[ (tree['f_isPrompt'] == False) & (tree['f_isEB'] == isEB) & (tree['f_pt'] > 18.) ]
